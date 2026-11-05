@@ -1,6 +1,6 @@
 # 0001. TypeScript pour l'application, Python seulement pour l'IA, dans un seul dev container
 
-- Statut : proposée
+- Statut : acceptée
 - Date : 2026-11-05
 - Décideurs : Wissem (tech-lead)
 
