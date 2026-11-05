@@ -36,27 +36,48 @@ if ($distros -notmatch 'Ubuntu') {
   Write-Host "ok : $ubuntu present, distribution par defaut"
 }
 
-# 2. Logiciels Windows, par winget (le gestionnaire de paquets de Windows)
-function Installer($id, $nom) {
-  winget list --id $id -e --accept-source-agreements | Out-Null
-  if ($LASTEXITCODE -eq 0) {
-    Write-Host "ok : $nom deja installe"
-  } else {
-    Write-Host "Installation de $nom..."
-    winget install --id $id -e --silent --accept-package-agreements --accept-source-agreements
-  }
+# 2. Logiciels Windows : inventaire d'abord, installation par winget seulement si absent
+# Premier chemin existant parmi une liste (le programme est-il deja sur le disque ?)
+function Trouver($chemins) {
+  $chemins | Where-Object { Test-Path $_ } | Select-Object -First 1
 }
 
-Etape "Docker Desktop"
-Installer 'Docker.DockerDesktop' 'Docker Desktop'
-$redemarrer = $true  # Docker Desktop demande souvent une reconnexion apres installation
+# Renvoie $true si le logiciel vient d'etre installe, $false s'il etait deja la
+function Installer($id, $nom, $chemins) {
+  # 1. Sur le disque : couvre aussi une installation faite a la main, hors winget
+  $trouve = Trouver $chemins
+  if ($trouve) {
+    Write-Host "ok : $nom deja installe ($trouve)"
+    return $false
+  }
+  # 2. Connu de winget
+  winget list --id $id -e --accept-source-agreements | Out-Null
+  if ($LASTEXITCODE -eq 0) {
+    Write-Host "ok : $nom deja installe (winget)"
+    return $false
+  }
+  Write-Host "Installation de $nom..."
+  winget install --id $id -e --silent --accept-package-agreements --accept-source-agreements | Out-Host
+  return $true
+}
 
-Etape "VS Code et ses extensions"
-Installer 'Microsoft.VisualStudioCode' 'VS Code'
-$code = @(
+$cheminsDocker = @("$env:ProgramFiles\Docker\Docker\Docker Desktop.exe")
+$cheminsCode = @(
   "$env:LOCALAPPDATA\Programs\Microsoft VS Code\bin\code.cmd",
   "$env:ProgramFiles\Microsoft VS Code\bin\code.cmd"
-) | Where-Object { Test-Path $_ } | Select-Object -First 1
+)
+$cheminsOllama = @(
+  "$env:LOCALAPPDATA\Programs\Ollama\ollama.exe",
+  "$env:ProgramFiles\Ollama\ollama.exe"
+)
+
+Etape "Docker Desktop"
+# Docker Desktop demande une reconnexion apres sa premiere installation
+if (Installer 'Docker.DockerDesktop' 'Docker Desktop' $cheminsDocker) { $redemarrer = $true }
+
+Etape "VS Code et ses extensions"
+Installer 'Microsoft.VisualStudioCode' 'VS Code' $cheminsCode | Out-Null
+$code = Trouver $cheminsCode
 if ($code) {
   # WSL : ouvrir un dossier Linux dans VS Code. Dev Containers : le dev container du projet.
   & $code --install-extension ms-vscode-remote.remote-wsl --force | Out-Null
@@ -67,11 +88,8 @@ if ($code) {
 }
 
 Etape "Ollama et le modele de dev"
-Installer 'Ollama.Ollama' 'Ollama'
-$ollama = @(
-  "$env:LOCALAPPDATA\Programs\Ollama\ollama.exe",
-  "$env:ProgramFiles\Ollama\ollama.exe"
-) | Where-Object { Test-Path $_ } | Select-Object -First 1
+Installer 'Ollama.Ollama' 'Ollama' $cheminsOllama | Out-Null
+$ollama = Trouver $cheminsOllama
 if ($ollama) {
   # Ollama tourne en arriere-plan (icone pres de l'horloge) ; on le demarre s'il ne repond pas
   try { Invoke-WebRequest -UseBasicParsing http://localhost:11434 -TimeoutSec 3 | Out-Null }
