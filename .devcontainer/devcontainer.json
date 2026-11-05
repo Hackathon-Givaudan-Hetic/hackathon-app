@@ -1,0 +1,45 @@
+{
+  "name": "Hackathon",
+  // VS Code démarre toute la stack, puis s'attache au service « dev »
+  "dockerComposeFile": ["../compose.yaml"],
+  "service": "dev",
+  "workspaceFolder": "/workspace",
+  "shutdownAction": "stopCompose",
+  "remoteUser": "node",
+
+  // Outils en plus de l'image, à la même version pour tous :
+  // la CLI GitHub (gh), et Python pour l'équipe Data/IA
+  "features": {
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    "ghcr.io/devcontainers/features/python:1": { "version": "3.12" }
+  },
+
+  // Les mêmes extensions et réglages pour toute l'équipe
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "github.vscode-pull-request-github",
+        "ms-python.python",
+        "ms-toolsai.jupyter"
+      ],
+      "settings": {
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.codeActionsOnSave": { "source.fixAll.eslint": "explicit" },
+        // Python et les notebooks utilisent l'environnement de ia/
+        "python.defaultInterpreterPath": "/workspace/ia/.venv/bin/python"
+      }
+    }
+  },
+
+  // L'API, le front, le service Data/IA, et PostgreSQL pour un client comme TablePlus
+  "forwardPorts": [3000, 5173, 8000, "db:5432"],
+
+  // Une fois, à la création : dépendances Node et Python, fichiers .env locaux
+  "postCreateCommand": "bash .devcontainer/post-create.sh",
+
+  // À chaque démarrage : si gh est connecté, git l'utilise pour s'authentifier (push, pull)
+  "postStartCommand": "gh auth status >/dev/null 2>&1 && gh auth setup-git || true"
+}

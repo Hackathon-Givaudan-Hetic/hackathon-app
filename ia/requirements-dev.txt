@@ -1,0 +1,4 @@
+# Dépendances du service, plus les outils de dev (pas en production)
+-r requirements.txt
+# Noyau Jupyter : les notebooks s'exécutent avec le Python de ia/.venv
+ipykernel==7.4.0

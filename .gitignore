@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.env
+db/data/
+# Python de l'équipe Data/IA
+.venv/
+__pycache__/
+# Brouillons de session des assistants de code
+.scratch/
