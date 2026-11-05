@@ -32,12 +32,12 @@ Le script demande votre mot de passe (Homebrew), votre nom et votre e-mail (pour
 
 Sous Windows, le projet tourne dans **Ubuntu (WSL)**, un Linux intégré à Windows : les fichiers y sont bien plus rapides, et PostgreSQL refuse souvent de démarrer depuis `C:\`.
 
-1. **Le script** : menu Démarrer → tapez `PowerShell` → clic droit → **Exécuter en tant qu'administrateur**, puis :
+1. **Le script** : menu Démarrer → tapez `PowerShell` → clic droit → **Exécuter en tant qu'administrateur**. La ligne doit commencer par `PS C:\WINDOWS\system32>` (si vous voyez `docker-desktop:~#`, c'est le terminal interne de Docker : fermez-le, et ne tapez pas `wsl`). Collez la commande **en une seule ligne**, elle se termine par `windows.ps1 | iex` :
    ```powershell
    irm https://raw.githubusercontent.com/Hackathon-Givaudan-Hetic/hackathon-app/develop/scripts/install/windows.ps1 | iex
    ```
    Il installe WSL 2 + Ubuntu, Docker Desktop, VS Code (extensions WSL et Dev Containers) et Ollama avec son modèle.
-2. **Redémarrez** l'ordinateur. Puis :
+2. **Redémarrez** l'ordinateur, puis **relancez la même commande** dans PowerShell administrateur : elle termine la configuration (Ubuntu devient la distribution WSL par défaut). Puis :
    - lancez **Docker Desktop** et acceptez ses conditions ; vérifiez Settings → General → **Use the WSL 2 based engine** coché, et Settings → Resources → **WSL integration** → **Ubuntu** activé ;
    - si le script n'a pas pu télécharger le modèle : dans PowerShell, `ollama pull llama3.2:1b`.
 3. **Ubuntu** : menu Démarrer → **Ubuntu**. La première fois, choisissez un nom d'utilisateur et un mot de passe (rien ne s'affiche quand vous tapez le mot de passe : c'est normal). Puis, dans ce terminal Ubuntu, votre identité pour les commits :
@@ -161,14 +161,15 @@ Base de données : `psql postgres://app:app@db:5432/app` dans le terminal de VS 
 
 ## Dépannage
 
-| Symptôme                                       | Parade                                                                                                                    |
-| ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| `concurrently: not found`, `command not found` | l'installation n'est pas finie : attendez que _Configuring Dev Container_ disparaisse de la barre du bas                  |
-| Le conteneur ne démarre pas                    | `F1` → `Dev Containers: Show Container Log`, puis `Rebuild Container`. Docker Desktop est-il lancé ?                      |
-| `Author identity unknown`                      | configurez `git config --global user.name/user.email` sur votre machine (Windows : dans Ubuntu), puis `Rebuild Container` |
-| `git push` refusé (authentification)           | dans le terminal de VS Code : `gh auth login && gh auth setup-git`                                                        |
-| `permission denied … docker.sock` (Linux)      | déconnectez-vous puis reconnectez-vous (groupe `docker`)                                                                  |
-| `relation "questions" does not exist`          | `Reopen Folder Locally`, supprimez `db/data` (Linux : `sudo rm -rf db/data`), puis `Reopen in Container`                  |
-| `model … not found`                            | `ollama pull llama3.2:1b` sur votre machine                                                                               |
-| IA injoignable (`verifier` en rouge)           | Ollama est-il lancé ? Linux : voir la configuration `OLLAMA_HOST` ci-dessus                                               |
-| Rien dans le navigateur                        | onglet **Ports** de VS Code : 3000 et 5173 doivent y figurer                                                              |
+| Symptôme                                               | Parade                                                                                                                    |
+| ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------- |
+| `concurrently: not found`, `command not found`         | l'installation n'est pas finie : attendez que _Configuring Dev Container_ disparaisse de la barre du bas                  |
+| `irm: not found`, invite `docker-desktop:~#` (Windows) | vous êtes dans le terminal interne de Docker : fermez-le, ouvrez **PowerShell en administrateur**                         |
+| Le conteneur ne démarre pas                            | `F1` → `Dev Containers: Show Container Log`, puis `Rebuild Container`. Docker Desktop est-il lancé ?                      |
+| `Author identity unknown`                              | configurez `git config --global user.name/user.email` sur votre machine (Windows : dans Ubuntu), puis `Rebuild Container` |
+| `git push` refusé (authentification)                   | dans le terminal de VS Code : `gh auth login && gh auth setup-git`                                                        |
+| `permission denied … docker.sock` (Linux)              | déconnectez-vous puis reconnectez-vous (groupe `docker`)                                                                  |
+| `relation "questions" does not exist`                  | `Reopen Folder Locally`, supprimez `db/data` (Linux : `sudo rm -rf db/data`), puis `Reopen in Container`                  |
+| `model … not found`                                    | `ollama pull llama3.2:1b` sur votre machine                                                                               |
+| IA injoignable (`verifier` en rouge)                   | Ollama est-il lancé ? Linux : voir la configuration `OLLAMA_HOST` ci-dessus                                               |
+| Rien dans le navigateur                                | onglet **Ports** de VS Code : 3000 et 5173 doivent y figurer                                                              |

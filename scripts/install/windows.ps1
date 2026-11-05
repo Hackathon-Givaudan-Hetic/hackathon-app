@@ -30,7 +30,10 @@ if ($distros -notmatch 'Ubuntu') {
   Write-Host "Ubuntu installe : un redemarrage sera necessaire."
 } else {
   wsl.exe --set-default-version 2 | Out-Null
-  Write-Host "ok : Ubuntu present"
+  # Ubuntu par defaut : sinon "wsl" peut ouvrir "docker-desktop", la distribution interne de Docker
+  $ubuntu = ($distros -split "`n" | Where-Object { $_ -match '^Ubuntu' } | Select-Object -First 1).Trim()
+  wsl.exe --set-default $ubuntu | Out-Null
+  Write-Host "ok : $ubuntu present, distribution par defaut"
 }
 
 # 2. Logiciels Windows, par winget (le gestionnaire de paquets de Windows)
