@@ -23,7 +23,7 @@ Dans l'application **Terminal** :
 curl -fsSL https://raw.githubusercontent.com/Hackathon-Givaudan-Hetic/hackathon-app/develop/scripts/install/macos.sh | bash
 ```
 
-Le script demande votre mot de passe (Homebrew), votre nom et votre e-mail (pour les commits). À la première ouverture de Docker Desktop, acceptez ses conditions dans sa fenêtre. Puis passez à **Démarrer en 3 étapes**.
+Le script demande votre mot de passe (Homebrew), votre nom et votre e-mail (pour les commits). À la première ouverture de Docker Desktop, acceptez ses conditions dans sa fenêtre. Puis passez à **Démarrer en 4 étapes**.
 
 </details>
 
@@ -32,12 +32,12 @@ Le script demande votre mot de passe (Homebrew), votre nom et votre e-mail (pour
 
 Sous Windows, le projet tourne dans **Ubuntu (WSL)**, un Linux intégré à Windows : les fichiers y sont bien plus rapides, et PostgreSQL refuse souvent de démarrer depuis `C:\`.
 
-1. **Le script** : menu Démarrer → tapez `PowerShell` → clic droit → **Exécuter en tant qu'administrateur**, puis :
+1. **Le script** : menu Démarrer → tapez `PowerShell` → clic droit → **Exécuter en tant qu'administrateur**. La ligne doit commencer par `PS C:\WINDOWS\system32>` (si vous voyez `docker-desktop:~#`, c'est le terminal interne de Docker : fermez-le, et ne tapez pas `wsl`). Collez la commande **en une seule ligne**, elle se termine par `windows.ps1 | iex` :
    ```powershell
    irm https://raw.githubusercontent.com/Hackathon-Givaudan-Hetic/hackathon-app/develop/scripts/install/windows.ps1 | iex
    ```
    Il installe WSL 2 + Ubuntu, Docker Desktop, VS Code (extensions WSL et Dev Containers) et Ollama avec son modèle.
-2. **Redémarrez** l'ordinateur. Puis :
+2. **Redémarrez** l'ordinateur, puis **relancez la même commande** dans PowerShell administrateur : elle termine la configuration (Ubuntu devient la distribution WSL par défaut). Puis :
    - lancez **Docker Desktop** et acceptez ses conditions ; vérifiez Settings → General → **Use the WSL 2 based engine** coché, et Settings → Resources → **WSL integration** → **Ubuntu** activé ;
    - si le script n'a pas pu télécharger le modèle : dans PowerShell, `ollama pull llama3.2:1b`.
 3. **Ubuntu** : menu Démarrer → **Ubuntu**. La première fois, choisissez un nom d'utilisateur et un mot de passe (rien ne s'affiche quand vous tapez le mot de passe : c'est normal). Puis, dans ce terminal Ubuntu, votre identité pour les commits :
@@ -47,7 +47,7 @@ Sous Windows, le projet tourne dans **Ubuntu (WSL)**, un Linux intégré à Wind
    ```bash
    git config --global user.email "vous@exemple.com"
    ```
-4. Passez à **Démarrer en 3 étapes**, **toujours dans le terminal Ubuntu**, jamais dans PowerShell.
+4. Passez à **Démarrer en 4 étapes**, **toujours dans le terminal Ubuntu**, jamais dans PowerShell.
 
 </details>
 
@@ -60,23 +60,30 @@ Dans un terminal :
 curl -fsSL https://raw.githubusercontent.com/Hackathon-Givaudan-Hetic/hackathon-app/develop/scripts/install/linux.sh | bash
 ```
 
-Le script demande votre mot de passe (sudo), votre nom et votre e-mail. Il installe Docker Engine, VS Code, Ollama, et configure Ollama pour qu'il soit joignable depuis les conteneurs (`OLLAMA_HOST=0.0.0.0` : évitez alors les Wi-Fi publics sans pare-feu). **Déconnectez-vous puis reconnectez-vous** (droit d'utiliser Docker), puis passez à **Démarrer en 3 étapes**.
+Le script demande votre mot de passe (sudo), votre nom et votre e-mail. Il installe Docker Engine, VS Code, Ollama, et configure Ollama pour qu'il soit joignable depuis les conteneurs (`OLLAMA_HOST=0.0.0.0` : évitez alors les Wi-Fi publics sans pare-feu). **Déconnectez-vous puis reconnectez-vous** (droit d'utiliser Docker), puis passez à **Démarrer en 4 étapes**.
 
 </details>
 
 Ollama tourne ensuite en arrière-plan sur votre machine : le projet le trouve tout seul, à l'adresse `host.docker.internal:11434`, déjà écrite dans les fichiers `.env`.
 
-## Démarrer en 3 étapes (moins de 5 minutes)
+## Démarrer en 4 étapes (moins de 5 minutes)
 
-1. **Cloner**, dans un terminal (Windows : le terminal **Ubuntu**) :
+1. **Cloner**, dans un terminal (Windows : le terminal **Ubuntu**, jamais PowerShell) :
    ```bash
    mkdir -p ~/projets && cd ~/projets
    ```
    ```bash
-   git clone https://github.com/Hackathon-Givaudan-Hetic/hackathon-app.git && code hackathon-app
+   git clone https://github.com/Hackathon-Givaudan-Hetic/hackathon-app.git
    ```
-2. **Ouvrir dans le conteneur** : dans VS Code, `F1` → `Dev Containers: Reopen in Container`. La première fois, environ 3 minutes : l'image se construit, la base démarre avec ses données de test, les dépendances Node et Python s'installent, les fichiers `.env` sont créés. Rien à taper.
-3. **Lancer et vérifier**, dans le terminal de VS Code (`` Ctrl+` ``) :
+2. **Ouvrir le dossier dans VS Code**, depuis VS Code lui-même (la commande `code` du terminal peut ouvrir un autre éditeur, comme Cursor) :
+   - **macOS et Linux** : `File` → `Open Folder…` → `projets/hackathon-app` dans votre dossier personnel → `Open`.
+   - **Windows** : `F1` → `WSL: Connect to WSL` ; dans la nouvelle fenêtre (`WSL: Ubuntu` en bas à gauche), `File` → `Open Folder…` → `/home/<votre-utilisateur>/projets/hackathon-app` → `OK`.
+   - Si VS Code demande _Do you trust the authors?_ : `Yes, I trust the authors`.
+3. **Ouvrir dans le conteneur** : `F1` → `Dev Containers: Reopen in Container` (ou la notification _Reopen in Container_, en bas à droite). La première fois, environ 3 minutes : l'image se construit, la base démarre avec ses données de test, les dépendances Node et Python s'installent, les fichiers `.env` sont créés. Rien à taper.
+
+   **Attendez que _Configuring Dev Container_ disparaisse de la barre du bas** avant de lancer une commande : pendant l'installation, `node_modules` est vidé puis réinstallé (`concurrently: not found` sinon). En bas à gauche doit s'afficher `Dev Container: Hackathon`.
+
+4. **Lancer et vérifier**, dans le terminal de VS Code (`` Ctrl+` ``) :
    ```bash
    npm run dev
    ```
@@ -89,6 +96,26 @@ gh auth login && gh auth setup-git
 ```
 
 La connexion est conservée, même après un `Rebuild Container`. Vous devez aussi avoir accepté l'invitation à l'organisation GitHub (reçue par e-mail).
+
+## Structure du projet
+
+```
+hackathon-app/
+├── api/                 l'API Express (TypeScript) : les routes sont dans api/src/index.ts
+├── web/                 le front React (TypeScript) : l'écran est dans web/src/App.tsx
+├── ia/                  le service Python (FastAPI) de l'équipe Data/IA : ia/main.py
+├── db/init/             le schéma et les données de test SQL, joués au premier démarrage
+├── docs/adr/            les décisions techniques (ADR) : pourquoi cette stack
+├── scripts/             verifier.sh (npm run verifier) et install/ (prérequis par système)
+├── .devcontainer/       le poste de travail : Dockerfile, devcontainer.json, post-create.sh
+├── .github/             la CI (workflows/ci.yml), CODEOWNERS, modèles de tickets et de PR
+├── .husky/              le hook pre-commit : ESLint et Prettier avant chaque commit
+├── compose.yaml         les services : poste de travail (dev) et PostgreSQL (db)
+├── package.json         le monorepo : les espaces de travail api et web, les scripts npm
+└── AGENTS.md            les règles du projet pour les assistants de code
+```
+
+Pour développer : une route dans `api/src/index.ts`, un écran dans `web/src/`, un traitement IA dans `ia/`. Le reste est l'environnement : on n'y touche qu'avec l'accord d'un tech-lead (`.github/CODEOWNERS`).
 
 ## Équipe Data/IA : le service Python
 
@@ -134,13 +161,15 @@ Base de données : `psql postgres://app:app@db:5432/app` dans le terminal de VS 
 
 ## Dépannage
 
-| Symptôme                                  | Parade                                                                                                                    |
-| ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| Le conteneur ne démarre pas               | `F1` → `Dev Containers: Show Container Log`, puis `Rebuild Container`. Docker Desktop est-il lancé ?                      |
-| `Author identity unknown`                 | configurez `git config --global user.name/user.email` sur votre machine (Windows : dans Ubuntu), puis `Rebuild Container` |
-| `git push` refusé (authentification)      | dans le terminal de VS Code : `gh auth login && gh auth setup-git`                                                        |
-| `permission denied … docker.sock` (Linux) | déconnectez-vous puis reconnectez-vous (groupe `docker`)                                                                  |
-| `relation "questions" does not exist`     | `Reopen Folder Locally`, supprimez `db/data` (Linux : `sudo rm -rf db/data`), puis `Reopen in Container`                  |
-| `model … not found`                       | `ollama pull llama3.2:1b` sur votre machine                                                                               |
-| IA injoignable (`verifier` en rouge)      | Ollama est-il lancé ? Linux : voir la configuration `OLLAMA_HOST` ci-dessus                                               |
-| Rien dans le navigateur                   | onglet **Ports** de VS Code : 3000 et 5173 doivent y figurer                                                              |
+| Symptôme                                               | Parade                                                                                                                    |
+| ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------- |
+| `concurrently: not found`, `command not found`         | l'installation n'est pas finie : attendez que _Configuring Dev Container_ disparaisse de la barre du bas                  |
+| `irm: not found`, invite `docker-desktop:~#` (Windows) | vous êtes dans le terminal interne de Docker : fermez-le, ouvrez **PowerShell en administrateur**                         |
+| Le conteneur ne démarre pas                            | `F1` → `Dev Containers: Show Container Log`, puis `Rebuild Container`. Docker Desktop est-il lancé ?                      |
+| `Author identity unknown`                              | configurez `git config --global user.name/user.email` sur votre machine (Windows : dans Ubuntu), puis `Rebuild Container` |
+| `git push` refusé (authentification)                   | dans le terminal de VS Code : `gh auth login && gh auth setup-git`                                                        |
+| `permission denied … docker.sock` (Linux)              | déconnectez-vous puis reconnectez-vous (groupe `docker`)                                                                  |
+| `relation "questions" does not exist`                  | `Reopen Folder Locally`, supprimez `db/data` (Linux : `sudo rm -rf db/data`), puis `Reopen in Container`                  |
+| `model … not found`                                    | `ollama pull llama3.2:1b` sur votre machine                                                                               |
+| IA injoignable (`verifier` en rouge)                   | Ollama est-il lancé ? Linux : voir la configuration `OLLAMA_HOST` ci-dessus                                               |
+| Rien dans le navigateur                                | onglet **Ports** de VS Code : 3000 et 5173 doivent y figurer                                                              |

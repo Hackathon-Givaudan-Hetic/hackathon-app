@@ -74,4 +74,4 @@ ollama pull llama3.2:1b
 echo "ok : $(ollama list | grep llama3.2 || true)"
 
 etape "Terminé"
-echo "Suite : README.md, section « Démarrer en 3 étapes »."
+echo "Suite : README.md, section « Démarrer en 4 étapes »."
